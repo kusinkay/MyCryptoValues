@@ -2,8 +2,8 @@
   "description": "Groups all my crypto coins to watch their fiat value",
   "manifest_version": 2,
   "name": "My Crypto Values",
-  "version": "1.13Beta",
-  "homepage_url_XXX": "https://github.com/mdn/webextensions-examples/tree/master/borderify",
+  "version": "1.14",
+  "homepage_url": "https://github.com/kusinkay/MyCryptoValues/tree/master/mozilla-addon",
   "icons": {
     "48": "icons/crypto-48.png"
   },
