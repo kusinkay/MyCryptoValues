@@ -1,0 +1,55 @@
+@CHARSET "UTF-8";
+#formApis fieldset{
+	float:left;
+	width:47%
+}
+#formTokens, #formApis button{
+	clear:both
+}
+pre{
+	padding: 20px;
+	border: solid 1px;
+}
+#dashboard{
+	width: 99%;
+}
+#noconf{
+	display: none;
+}
+#backup, #restore{
+	float: left;
+	width: 50%;
+}
+.delAddress, .addAddress{
+	cursor: pointer;
+}
+.back{
+	clear:both;
+}
+#dashboard{
+	margin-bottom: 15px;
+	float: left;
+}
+#logger{
+	font-size: 0.75em; margin-top: 10px
+}
+li{
+	line-height: 1.8em;
+}
+.crypto{
+	text-decoration: none;
+	color: maroon;
+	line-height: 15px;
+}
+.crypto:hover{
+	text-decoration: underline;
+	color: gray;
+}
+label span:BEFORE{
+	content: '';
+}
+label span{
+	clear: both;
+	font-size: 0.7em;
+	font-style: italic;
+}

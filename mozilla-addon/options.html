@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Set your tokens</title>
+<link rel="stylesheet" type="text/css" href="css/options.css"/>
+
+</head>
+<body>
+<div>
+	<form id="formApis">
+		<fieldset id="cryptoid">
+			<b>Cyptoid.info</b><br>
+			<label>
+				API key<br>
+				<input name="cryptoid_api_key" value=""/>
+				<span>Mandatory for most of the tokens balance. <a target="_blank" href="https://chainz.cryptoid.info/api.key.dws">Get yours</a></span>
+			</label>
+		</fieldset>
+		<fieldset id="etherscan">
+			<b>Etherscan.io</b><br>
+			<label>
+				API key<br>
+				<input name="etherscan_api_key" value=""/>
+				<span>Mandatory for Ethereum balance. <a target="_blank" href="https://etherscan.io/myapikey">Get yours</a></span>
+			</label>
+		</fieldset>
+	</form>
+	<br>
+	<form id="formTokens">
+		<input type="button" class="addToken" value="Create Crypto"/>
+		<input type="button" class="reload" value="Reload"/>
+		<input type="button" class="persist" value="Save setup"/>
+		<input type="button" class="download" value="Backup"/>
+		
+		<fieldset id="entry">
+			<label>
+				Token<br>
+				<select name="class">
+				</select>
+				
+			</label>
+			<br>
+			<label>
+				Address<br>
+				<input type="text" size="90" name="address" id="address_0"/>
+				<span>Check your token wallet to find it out</span>
+				
+			</label>
+			<div  class="optionBox">
+				<div class="block">
+			        <span class="addAddress">Add Address</span>
+			    </div>
+		    </div>
+			<br>
+			<label>
+				Info<br>
+				<textarea cols="90" name="info"></textarea>
+			</label>
+			<br>
+			<input type="hidden" name="amount"/>
+			<input type="hidden" name="action" value="new"/>
+			<input type="hidden" name="index" value=""/>
+			<button id="closeToken">Close</button>
+			<button id="deleteToken">Delete</button>
+			<button id="saveToken">Save</button>
+		</fieldset>
+		<fieldset id="altcoin" style="display:none">
+			<label>
+				Contract address<br>
+				<input type="text" name="contract" size="90"/>
+				<input type="hidden" name="tokeni"/>
+				<input type="hidden" name="altcoinj"/>
+				<span>Check the address explorer you like (i.e. etherscan.io) and list the tokens attached to your address</span>
+			</label>
+			<br>
+			<label>
+				Folder<br>
+				<input type="text" name="fsname" size="30"/>
+				<span>Folder name used by https://api.coinmarketcap.com/v1/ticker/{folder}/</span>
+			</label>
+			<br>
+			<label>
+				Amount<br>
+				<input type="text" name="altcoinAmount" size="15"/>
+				<span>Use JIC there is no address or not listed in coinmarketcap, with bridge coin</span>
+			</label>
+			<br>
+			<fieldset>
+				<label>
+					Bridge coin<br>
+					<select name="bridge">
+						<option></option>
+					</select>
+				</label>
+				<br>
+				<label>
+					Bridge amount/expression<br>
+					<input type="text" name="bridgeAmount" size="15"/>
+					<span>How many tokens of the bridge coin worth it (or expression as 1/166). Use during ICO while its value is 0, you can use the buy value.</span>
+				</label>
+			</fieldset>
+			<br>
+			<label>
+				Info<br>
+				<textarea cols="90" name="altcoinInfo"></textarea>
+			</label>
+			<br>
+			<button id="closeContract">Close</button>
+			<button id="deleteContract">Delete</button>
+			<button id="saveContract">Save</button>
+		</fieldset>
+		
+	</form>
+	<div id="dashboard"></div>
+	<div id="noconf">
+		No configuration found.<br>
+		Start loading your tokens or <a class="loadSample" href="#">load sample</a>.<br>
+		Sample will help you to see all the tokens supported and would be a 
+		good starting point to define your tokens. <br>Change the existing addresses with yours 
+		and delete the ones that doesn' apply for you.
+	</div>
+	<input type="button" class="addToken" value="Create Crypto"/>
+	<input type="button" class="reload" value="Reload"/>
+	<input type="button" class="persist" value="Save setup"/>
+	<input type="button" class="download" value="Backup"/>
+		
+	<div id="logger" style=""></div>
+</div>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/sha.js"></script>
+<script type="text/javascript" src="js/cryptocoins.js"></script>
+<script type="text/javascript" src="js/options.js"></script>

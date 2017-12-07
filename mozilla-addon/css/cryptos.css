@@ -1,0 +1,38 @@
+@CHARSET "UTF-8";
+#setup{
+	display: none;
+}
+.update
+{
+    display:inline-block;
+    vertical-align:middle;
+    width:15px;
+    height:15px;
+    border:none;
+    background:url(../icons/update.png) center center no-repeat;
+    background-size:100%;
+    cursor:pointer;
+}
+.update:hover,
+.update:focus
+{
+    opacity:0.8;
+}
+
+.update.working
+{
+    pointer-events:none;
+    opacity:0.5;
+    animation: rotating 2s linear infinite;
+}
+@keyframes rotating 
+{
+    from
+    {
+        transform:rotate(360deg);
+    }
+    to
+    {
+        transform:rotate(0deg);
+    }
+}

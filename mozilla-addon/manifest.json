@@ -1,0 +1,36 @@
+{
+  "description": "Groups all my crypto coins to watch their fiat value",
+  "manifest_version": 2,
+  "name": "My Crypto Values",
+  "version": "1.13Beta",
+  "homepage_url_XXX": "https://github.com/mdn/webextensions-examples/tree/master/borderify",
+  "icons": {
+    "48": "icons/crypto-48.png"
+  },
+  
+  "permissions": [
+    "activeTab", "alarms", "storage", "downloads",
+    "*://chainz.cryptoid.info/*", 
+    "*://api.kraken.com/*",
+    "*://neoexplorer.co/*",
+    "*://chain.fair.to/*"
+  ],
+  
+  "background": {
+    "scripts": [
+    	"js/jquery.js",
+    	"js/sha.js",
+    	"js/cryptocoins.js",
+    	"js/background.js"
+    ]
+  },
+  "options_ui":
+    {
+    	"page":"options.html"
+    },
+  "browser_action": {
+    "default_icon": "icons/crypto-32.png",
+    "default_title": "My Crypto Values",
+    "default_popup": "index.html"
+  }
+}

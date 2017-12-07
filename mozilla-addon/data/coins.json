@@ -1,0 +1,136 @@
+{
+  "cryptos": [
+    {
+      "class": "Ethereum",
+      "amount": "",
+      "info": "",
+      "addresses": [
+        {
+          "address": "0x7c31560552170ce96c4a7b018e93cddc19dc61b6"
+        }
+      ],
+      "contracts": [
+        {
+          "address": "0xab95e915c123fded5bdfb6325e35ef5515f1ea69",
+          "fsname": "xenon",
+          "info": "",
+          "amount": ""
+        },
+        {
+          "address": "0x519475b31653e46d20cd09f9fdcf3b12bdacb4f5",
+          "fsname": "viuly",
+          "info": "",
+          "amount": ""
+        },
+        {
+          "address": "0x0cf0ee63788a0849fe5297f3407f701e122cc023",
+          "fsname": "streamr-datacoin",
+          "info": "",
+          "amount": ""
+        },
+        {
+          "address": "",
+          "fsname": "kusinkays",
+          "info": "One that I havve invented and it is not listed.\nTo ilustrate a sample of a token buy tha is not listed yet",
+          "amount": "1000",
+          "bridgecoin": {
+            "class": "Ethereum",
+            "amount": "0.2/1000"
+          }
+        }
+      ]
+    },
+    {
+      "class": "Bitcoin",
+      "amount": "",
+      "info": "Let's imagine that all this addresses (picked randomly) belong to the same wallet",
+      "addresses": [
+        {
+          "address": "1Dg3sqf9HaGohcWacZ4ZwmZ3d6obYrBQVu"
+        },
+        {
+          "address": "3Jz4L2eX5qHXQt8VygByGy5Vcbss6oCeQp"
+        }
+      ]
+    },
+    {
+      "class": "Creativecoin",
+      "amount": "",
+      "info": "",
+      "addresses": [
+        {
+          "address": "CWzKLrt3HvbZm77giGTQzr14VpbLYKv6z2"
+        }
+      ]
+    },
+    {
+      "class": "Dash",
+      "amount": "",
+      "info": "",
+      "addresses": [
+        {
+          "address": "XahxgieYfWT35q17Eu275cAT6j9ENAEpPs"
+        },
+        {
+          "address": "XssjzLKgsfATYGqTQmiJURQzeKdpL5K1k3"
+        },
+        {
+          "address": ""
+        }
+      ]
+    },
+    {
+      "class": "Faircoin",
+      "amount": "",
+      "info": "",
+      "addresses": [
+        {
+          "address": "fMpNza226yqSGDJNv4g8mtaDUN8DDatBW9"
+        },
+        {
+          "address": ""
+        }
+      ]
+    },
+    {
+      "class": "Litecoin",
+      "amount": "",
+      "info": "",
+      "addresses": [
+        {
+          "address": "LQ2JZheeNgT31BVJa6YE6Yp87VyXBEsZUi"
+        }
+      ]
+    },
+    {
+      "class": "Neo",
+      "amount": "",
+      "info": "",
+      "addresses": [
+        {
+          "address": "ALzmgAZVtQiVVNm6rUhgHZuPcu41tpmBQY"
+        }
+      ]
+    },
+    {
+      "class": "Ripple",
+      "amount": "",
+      "info": "",
+      "addresses": [
+        {
+          "address": "rK5j9n8baXfL4gzUoZsfxBvvsv97P5swaV"
+        }
+      ]
+    }
+  ],
+  "apis": [
+    {
+      "web": "cryptoid",
+      "api_key": "GETYOUROWNKEY"
+    },
+    {
+      "web": "etherscan",
+      "api_key": "GETYOUROWNKEY"
+    }
+  ]
+}
