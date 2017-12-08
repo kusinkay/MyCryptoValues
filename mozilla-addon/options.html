@@ -29,11 +29,12 @@
 	<br>
 	<form id="formTokens">
 		<input type="button" class="addToken" value="Create Crypto"/>
+		<input type="button" class="addExchange" value="Create Exchange"/>
 		<input type="button" class="reload" value="Reload"/>
 		<input type="button" class="persist" value="Save setup"/>
 		<input type="button" class="download" value="Backup"/>
 		
-		<fieldset id="entry">
+		<fieldset id="entry" class="miniform">
 			<label>
 				Token<br>
 				<select name="class">
@@ -65,7 +66,7 @@
 			<button id="deleteToken">Delete</button>
 			<button id="saveToken">Save</button>
 		</fieldset>
-		<fieldset id="altcoin" style="display:none">
+		<fieldset id="altcoin" style="display:none" class="miniform">
 			<label>
 				Contract address<br>
 				<input type="text" name="contract" size="90"/>
@@ -110,9 +111,38 @@
 			<button id="deleteContract">Delete</button>
 			<button id="saveContract">Save</button>
 		</fieldset>
+		<fieldset id="exchange" class="miniform">
+			<label>
+				Exchange<br>
+				<select name="xClass">
+					<option>Kraken</option>
+				</select>
+			</label>
+			<br>
+			<label>
+				API key<br>
+				<input type="text" name="xApiKey" size="30"/>
+				<span>Check your Kraken account and create an API entry</span>
+			</label>
+			<br>
+			<label>
+				API private key<br>
+				<input type="text" name="xApiPrvKey" size="30"/>
+				<span>Check your Kraken account and create an API entry</span>
+			</label>
+			<br>
+			<input type="text" name="exchangei"/>
+			<button id="closeExchange">Close</button>
+			<button id="deleteExchange">Delete</button>
+			<button id="saveExchange">Save</button>
+		</fieldset>
 		
 	</form>
-	<div id="dashboard"></div>
+	<div id="dbcontainer">
+		<div id="dashboard"></div>
+		<div id="exchanges"></div>
+	</div>
+	<div class="clear"></div>
 	<div id="noconf">
 		No configuration found.<br>
 		Start loading your tokens or <a class="loadSample" href="#">load sample</a>.<br>
@@ -121,6 +151,7 @@
 		and delete the ones that doesn' apply for you.
 	</div>
 	<input type="button" class="addToken" value="Create Crypto"/>
+	<input type="button" class="addExchange" value="Create Exchange"/>
 	<input type="button" class="reload" value="Reload"/>
 	<input type="button" class="persist" value="Save setup"/>
 	<input type="button" class="download" value="Backup"/>

@@ -1,7 +1,8 @@
 var browser = browser || chrome;
 
 var table;
-var cryptos;
+var cryptos,
+	exchanges;
 
 
 
@@ -65,6 +66,19 @@ function restoreOptions() {
 				}
             }
         });
+        browser.storage.local.get("exchanges",function(result)
+        {
+            if(!result || !result.exchanges) {
+            	log("Couldn't load exchanges from storage");
+            	
+            }else{
+	            log('loading exchanges from storage: ' + result.exchanges.length);
+				if (result.exchanges){
+					exchanges = result.exchanges;
+					reloadExchanges(result);
+				}
+            }
+        });
         
     });
 	
@@ -86,7 +100,7 @@ function restoreOptions() {
 }
 
 function reloadCoins(result){
-	$('#dashboard').html('');
+	$('#dashboard').html('<h2>Tokens</h2>');
 	log(result.cryptos.length + " cryptos carregades");
 	cryptos = result.cryptos;
 	output('<ul>');
@@ -116,8 +130,8 @@ function reloadCoins(result){
 	$('a.crypto').click(function(e){
 		e.preventDefault();
 		var i = $(this).attr('id').replace('token_', '');
+		$('.miniform').hide();
 		$('#entry').show();
-		$('#altcoin').hide();
 		
 		log(cryptos[i].class);
 		$('[name=class]').val(cryptos[i].class)
@@ -166,8 +180,9 @@ function reloadCoins(result){
 			}
 			$('[name=tokeni]').val(tokeni);
 			$('[name=altcoinj]').val(altcoinj);
+			$('.miniform').hide();
 			$('#altcoin').show();
-			$('#entry').hide();
+			
 			
 		}
 		
@@ -176,8 +191,8 @@ function reloadCoins(result){
 	$('.addContract').unbind('click');
 	$('.addContract').click(function(){
 		var i = $(this).attr('id').replace('addContract_', '');
+		$('.miniform').hide();
 		$('#altcoin').show();
-		$('#entry').hide();
 		$('[name=contract]').val("");
 		$('[name=tokeni]').val(i);
 		$('[name=altcoinj]').val('');
@@ -198,8 +213,59 @@ function reloadCoins(result){
 		$('#entry').hide();
 	});
 
+	$('.addExchange').unbind('click');
+	$('.addExchange').click(function(){
+		$('.miniform').hide();
+		$('#exchange').show();
+		$('[name=xApiKey]').val('');
+		$('[name=xApiPrvKey]').val('');
+		$('[name=exchangei]').val('');
+		$('#deleteExchange').hide();
+	});
+	
+	$('#closeExchange').unbind('click');
+	$('#closeExchange').click(function(){
+		$('#exchange').hide();
+	});
+	
+	$('#saveExchange').unbind('click');
+	$('#saveExchange').click(function(){
+		var exchange = {
+			class: $('[name=xClass]').val(),
+			api_key: $('[name=xApiKey]').val(),
+			private_key: $('[name=xApiPrvKey]').val(),
+		};
+		if ($('[name=exchangei]').val()!=''){
+			//update
+			var i = $('[name=exchangei]').val();
+			exchanges[i] = exchange;
+		}else{
+			exchanges.push(exchange);
+			var result = {exchanges: exchanges};
+			reloadExchanges(result);
+		}
+		$('#exchange').hide();
+	});
+	
+	$('#deleteExchange').unbind('click');
+	$('#deleteExchange').click(function(){
+		if (confirm('Are you sure to delete?')){
+			var exchangei = $('[name=exchangei]').val();
+			
+			if (exchangei!='' ){
+				exchanges.splice(exchangei, 1);
+				reloadExchanges({exchanges: exchanges});
+				$('#exchange').hide();
+			}
+			
+		}
+		
+	});
+	
+	
 	$('.addToken').unbind('click');
 	$('.addToken').click(function(){
+		$('.miniform').hide();
 		$('#entry').show();
 		$('[name=class]').val("")
 			.removeAttr("disabled");
@@ -333,8 +399,33 @@ function reloadCoins(result){
 	});
 }
 
+function reloadExchanges(result){
+	$('#exchanges').html('<h2>Exchanges</h2>');
+	
+	exchange('<ul>');
+	for (var i=0; i<result.exchanges.length; i++){
+		exchange('<li>' + (i+1) + ' - <a class="exchange" id="exchange_' + i + '" href="#">' + result.exchanges[i].class + '</a></li>');
+	}
+	exchange('</ul>');
+	
+	$('.exchange').unbind('click');
+	$('.exchange').click(function(){
+		$('.miniform').hide();
+		$('#exchange').show();
+		var index = $(this).attr('id').replace('exchange_', '');
+		$('[name=xApiKey]').val(exchanges[index].api_key);
+		$('[name=xApiPrvKey]').val(exchanges[index].private_key);
+		$('[name=exchangei]').val(index);
+		$('#deleteExchange').show();
+	});
+}
+
 function output(text){
 	$('#dashboard').append(text);
+}
+
+function exchange(text){
+	$('#exchanges').append(text);
 }
 
 function log(text){

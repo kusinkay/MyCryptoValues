@@ -6,8 +6,9 @@ var browser = browser || chrome;
 browser.alarms.onAlarm.addListener(run);
 browser.alarms.create('update', {periodInMinutes: 1 });
 
-var cryptos;
-var apis;
+var cryptos,
+	apis,
+	exchanges;
 
 var debugVar;
 
@@ -40,7 +41,21 @@ function getConf(){
             }
         });
     });
-	return Promise.all([g1, g2]);
+	var g3 = new Promise(function(ok,  reject)
+    {
+        browser.storage.local.get("exchanges",function(result)
+        {
+            if(!result || !result.exchanges) {
+            	console.debug('could not load background storage exchanges');
+            	
+            }else{
+	            console.debug('loading exchanges from storage');
+	            exchanges = result.exchanges;
+            }
+            ok();
+        });
+    });
+	return Promise.all([g1, g2, g3]);
 }
 
 async function run(){
@@ -80,7 +95,8 @@ async function run(){
 	await getConf();
 	var result = {
 		cryptos: cryptos,
-		apis: apis
+		apis: apis,
+		exchanges: exchanges
 	};
 	table.loadData(result, function(){
 		table.gather();

@@ -3,6 +3,7 @@
  */
 var cryptos;
 var apis;
+var exchanges;
 
 var table = new CryptoTable({
 	'completeGather': function(){
@@ -102,14 +103,31 @@ function getConf(){
             }
         });
     });
-	return Promise.all([g1, g2])
+	
+	var g3 = new Promise(function(ok,  reject)
+    {
+        browser.storage.local.get("exchanges",function(result)
+        {
+            if(!result || !result.exchanges) {
+            	console.debug('no exchanges defined');
+            }else{
+            	console.debug('loading exchanges from storage');
+            	exchanges = result.exchanges;
+            }
+
+        	ok();
+        });
+    });
+
+	return Promise.all([g1, g2, g3])
 }
 
 async function run(){
 	await getConf();
 	var result = {
 			cryptos: cryptos,
-			apis: apis
+			apis: apis,
+			exchanges: exchanges
 	}
 	table.loadData(result, function(){
 		table.render();

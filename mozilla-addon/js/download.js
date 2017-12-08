@@ -1,7 +1,9 @@
 var browser = browser || chrome;
 
-var cryptos;
-var apis;
+var cryptos,
+	apis,
+	exchanges;
+
 function getConf(){
 	var g1 = new Promise(function(ok,  reject)
 	{
@@ -35,7 +37,24 @@ function getConf(){
 	    
 	});
 	
-	return Promise.all([g1, g2]);
+	var g3 = new Promise(function(ok,  reject)
+	{
+	    browser.storage.local.get("exchanges",function(result)
+	    {
+	        if(!result || !result.exchanges) {
+	        	log('no exchanges defined');
+	        	
+	        }else{
+	        	exchanges = result.exchanges;
+	        	log(result.exchanges.length + ' exchanges from conf');
+	        }
+
+        	ok();
+	    });
+	    
+	});
+	
+	return Promise.all([g1, g2, g3]);
 }
 
 function log(text){
@@ -49,7 +68,8 @@ async function run(){
 	log('exit getConf');
 	var result = {
 			cryptos: cryptos,
-			apis: apis
+			apis: apis,
+			exchanges: exchanges
 	}
 	$('#backup textarea').val(JSON.stringify(result, null, 2));
 
@@ -73,7 +93,7 @@ $(document).ready(function(){
 		}
 		if (commit){
 			var json = JSON.parse($('#restore textarea').val());
-			browser.storage.local.set({cryptos: json.cryptos, apis: json.apis})
+			browser.storage.local.set({cryptos: json.cryptos, apis: json.apis, exchanges: json.exchanges})
 		}
 	});
 	

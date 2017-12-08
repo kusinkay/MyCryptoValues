@@ -1,4 +1,10 @@
 @CHARSET "UTF-8";
+li{
+	list-style: none;
+}
+#exchange{
+	display: none;
+}
 #formApis fieldset{
 	float:left;
 	width:47%
@@ -10,8 +16,12 @@ pre{
 	padding: 20px;
 	border: solid 1px;
 }
-#dashboard{
-	width: 99%;
+.clear{
+	clear:both;
+}
+#dashboard, #exchanges{
+	width: 49%;
+	float:left;
 }
 #noconf{
 	display: none;
@@ -36,7 +46,7 @@ pre{
 li{
 	line-height: 1.8em;
 }
-.crypto{
+.crypto, .exchange{
 	text-decoration: none;
 	color: maroon;
 	line-height: 15px;

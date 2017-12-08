@@ -132,5 +132,12 @@
       "web": "etherscan",
       "api_key": "GETYOUROWNKEY"
     }
+  ],
+  "exchanges": [
+    {
+      "class": "Kraken",
+      "api_key": "GETYOUROWNAPIKEY",
+      "private_key": "GETYOUROWNAPIPRIVATEKEY"
+    }
   ]
 }
