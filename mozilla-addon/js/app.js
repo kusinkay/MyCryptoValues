@@ -33,7 +33,7 @@ var table = new CryptoTable({
 
 function convert(){
 	var crypto;
-	var o = {'amount': $('#inTokens').val()};
+	var o = {'amount': $('#inTokens').val(), apis: apis};
 	switch($('#token').val()){
 		case 'ETH':
 			crypto = new Ethereum(o);

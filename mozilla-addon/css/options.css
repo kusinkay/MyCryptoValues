@@ -1,4 +1,10 @@
 @CHARSET "UTF-8";
+
+.boxsizingBorder{
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
 li{
 	list-style: none;
 }
@@ -29,6 +35,9 @@ pre{
 #backup, #restore{
 	float: left;
 	width: 50%;
+}
+#backup textarea, #restore textarea{
+	width: 100%;
 }
 .delAddress, .addAddress{
 	cursor: pointer;

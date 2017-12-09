@@ -29,16 +29,27 @@ var CryptoTable = function(ctObj){
 			url: file,
 			data: {format: 'json', callback: '?'},
 			success: function(data){
-				$.each( data, function( key, val ) {
-					var output = {
-						cryptos: []
+				var cLoaded = false,
+					aLoaded = false,
+					output = {
+						cryptos: [],
+						apis: []
 					};
+				$.each( data, function( key, val ) {
 					if (key=='cryptos'){
 						for (var i=0; i<val.length; i++){
 							//var crypto = that.getCryptoFromJson(val[i]);
 							output.cryptos.push(val[i]);
 						}
-						if (typeof callback == 'function'){
+						cLoaded = true;
+						if (cLoaded && aLoaded && typeof callback == 'function'){
+							callback(output);
+						}
+					}
+					if (key=='apis'){
+						output.apis = val;
+						aLoaded = true;
+						if (cLoaded && aLoaded && typeof callback == 'function'){
 							callback(output);
 						}
 					}

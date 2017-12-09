@@ -60,9 +60,7 @@ function restoreOptions() {
             }else{
 	            log('loading apis from storage: ' + result.apis.length);
 				if (result.apis){
-					for (var i=0; i<result.apis.length; i++){
-						$('[name=' + result.apis[i].web + '_api_key]').val(result.apis[i].api_key);
-					}
+					reloadApis(result);
 				}
             }
         });
@@ -85,7 +83,11 @@ function restoreOptions() {
 	$('.loadSample').click(function(){
 		log('loading cryptos from file');
 		$('#noconf').hide();
-		table.tmpLoad('data/coins.json', reloadCoins);
+		table.tmpLoad('data/coins.json', function(result){
+			reloadCoins(result);
+			log('loading apis from sample: ' + result.apis.length)
+			reloadApis(result);
+		});
 	});
 	
 	
@@ -97,6 +99,12 @@ function restoreOptions() {
     console.log(`Error: ${error}`);
   }
 
+}
+
+function reloadApis(result){
+	for (var i=0; i<result.apis.length; i++){
+		$('[name=' + result.apis[i].web + '_api_key]').val(result.apis[i].api_key);
+	}
 }
 
 function reloadCoins(result){
