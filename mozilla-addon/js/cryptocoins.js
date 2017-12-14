@@ -63,28 +63,7 @@ var CryptoTable = function(ctObj){
 		var xLoaded = 100000;
 		var cLoaded = false;
 		var apisLoaded = false;
-		if (data.exchanges!=undefined){
-			xLoaded = data.exchanges.length;
-			for (var i=0; i<data.exchanges.length; i++){
-				var exchange = that.getExchangeFromJson(data.exchanges[i]);
-				exchange.getCryptos(function(cryptos){
-					console.debug('cryptos from exchange gotten: ' + cryptos.length);
-					if (cryptos!=undefined){
-						for (var j=0; j<cryptos.length; j++){
-							that.addCrypto(cryptos[j]);
-						}
-					}
-					debugVar = that;
-					xLoaded--;
-					if (xLoaded==0 && cLoaded && apisLoaded && typeof callback == 'function'){
-						callback();
-					}
-					
-				});
-			}
-		}else{
-			xLoaded=0;
-		}
+		
 		if (data.apis!=undefined){
 			console.debug('apis to load: ' + data.apis.length);
 			that.apis = data.apis;
@@ -107,6 +86,28 @@ var CryptoTable = function(ctObj){
 			if (xLoaded==0 && cLoaded && apisLoaded && typeof callback == 'function'){
 				callback();
 			}
+		}
+		if (data.exchanges!=undefined){
+			xLoaded = data.exchanges.length;
+			for (var i=0; i<data.exchanges.length; i++){
+				var exchange = that.getExchangeFromJson(data.exchanges[i]);
+				exchange.getCryptos(function(cryptos){
+					console.debug('cryptos from exchange gotten: ' + cryptos.length);
+					if (cryptos!=undefined){
+						for (var j=0; j<cryptos.length; j++){
+							that.addCrypto(cryptos[j]);
+						}
+					}
+					debugVar = that;
+					xLoaded--;
+					if (xLoaded==0 && cLoaded && apisLoaded && typeof callback == 'function'){
+						callback();
+					}
+					
+				});
+			}
+		}else{
+			xLoaded=0;
 		}
 	}
 	
@@ -344,7 +345,7 @@ var CryptoidAPI = function(spec){
 		
 		that.pattern = spec.pattern;
 		
-		that._getBalanceData = function(url, callback){
+		that._getBalanceData = function(url, callback, fallback){
 			if (that.crypto.amount!=undefined && that.crypto.amount!='' && (that.crypto.address==undefined || that.crypto.address=='')){
 				that.crypto.convert(that.crypto.amount, callback, !that.justdata);
 			}else{
@@ -388,6 +389,10 @@ var CryptoidAPI = function(spec){
 					error: function(){
 						if (that.crypto.amount!=undefined && that.crypto.amount!=''){
 							that.crypto.convert(that.crypto.amount, callback, !that.justdata);
+						}else{
+							if (typeof fallback == 'function'){
+								fallback();
+							}
 						}
 					},
 					beforeSend: function(xhr){
@@ -429,6 +434,7 @@ var Crypto = function (spec){
 	that.justdata = true;
 	that.apis = spec.apis;
 	that.pattern = spec.pattern;
+	that.errors = [];
 	
 	that.getBalance = function(callback){
 		var pattern;
@@ -440,7 +446,13 @@ var Crypto = function (spec){
 			console.error('No pattern specified for coin');
 		}
 		var url = pattern.replace(/{action}/g, 'balance').replace(/{address}/g, (spec.address!=undefined ? spec.address : '') );
-		that._getBalanceData(url, callback);
+		that._getBalanceData(url, callback, function(){
+			/*in case of error*/
+			that.errors.push('Could not load balance');
+			if (!that.justdata){
+				that.convert(0, callback, !that.justdata);
+			}
+		});
 	}
 	
 	that.getAmount = function(){
@@ -473,7 +485,11 @@ var Crypto = function (spec){
 					urlInfo += '&nbsp;<a target="_blank" href="'+ url +'">+</a>'
 				}
 			}
-			$(spec.container).prepend('<tr><td>'+ data.name + urlInfo +
+			var errInfo ='';
+			if (that.errors.length>0 || data.errors && data.errors.length>0){
+				errInfo = 'error';
+			}
+			$(spec.container).prepend('<tr class="' + errInfo + '"><td>'+ data.name + urlInfo +
 				"</td>"+
 				"<td><a href='#' title='" + bridgeInfo + "'>" + data.value + (that.amount!=undefined && that.amount!='' ? '(k)' : '') + "</td>"+
 				"<td>" + data.percent_change_1h + "</td>"+
@@ -518,20 +534,41 @@ var Crypto = function (spec){
 		}else{
 			var url = that.pattern.replace(/{action}/g, 'tokenbalance').replace(/{address}/g, spec.addresses[0].address);
 			url = url.replace(/{contract}/g, currentAltCoin.address);
-			{
-				$.getJSON(url, function(data){
-					if (data.error != undefined){
-						
-					}else{
-						if(data.message == 'OK'){
-							var ethers = data.result / 10**18;
-							console.debug(that.contracts);
-							that._convertAltCoin(currentAltCoin, ethers, callback);
+			try{
+			$.ajax({
+				url: url,
+				dataType: "json",
+				statusCode: {
+					200: function(data){
+						if (data.error != undefined){
+							
+						}else{
+							if(data.message == 'OK'){
+								var ethers = data.result / 10**18;
+								console.debug(that.contracts);
+								that._convertAltCoin(currentAltCoin, ethers, callback);
+							}
 						}
+					},
+					403: function(jqxhr, textStatus, error){
+						that.fallbackAltCoin(currentIndex, callback);
 					}
-				});
+				}
+			});
+			}catch(e){
+				console.error('Altcoin tokenbalance failed (' + textStatus + '): ' + currentAltCoin.address);
 			}
+			
 		}
+	}
+	
+	that.fallbackAltCoin = function(i, callback){
+		if (!that.contracts[i].errors){
+			that.contracts[i].errors = [];
+		}
+		that.contracts[i].errors.push('Token contract not loaded');
+		console.error('Altcoin tokenbalance failed ');
+		that._convertAltCoin(that.contracts[i], 0, callback);
 	}
 	
 	that._convertAltCoin = function (currentAltCoin, ethers, callback){
@@ -547,6 +584,7 @@ var Crypto = function (spec){
 				data[0].bridge = currentAltCoin.bridgecoin;
 			}
 			data[0].contract = currentAltCoin.address;
+			data[0].errors = currentAltCoin.errors;
 			var fiat = that.render(data[0]);
 			data[0].fiat = fiat;
 			if (typeof callback=='function'){
@@ -586,19 +624,31 @@ var Ethereum = function(spec){
 	
 	that.className="Ethereum";
 	that.contracts = [];
-	that._getBalanceData = function(url, callback){
+	that._getBalanceData = function(url, callback, fallback){
 		var url = that.pattern.replace(/{action}/g, 'balance').replace(/{address}/g, (spec.addresses[0].address!=undefined ? spec.addresses[0].address : '') );
 		
 		if (spec.amount!=undefined && spec.amount!=''){
 			that.convert(spec.amount, callback, !that.justdata);
 		}else{
-			$.getJSON(url, function(data){
-				if(data.message == 'OK'){
-					var ethers = data.result / 10**18;
-					that.convert(ethers, callback, !that.justdata);
-					
+			$.ajax({
+				url: url,
+				statusCode:{
+					200: function(data){
+						if(data.message == 'OK'){
+							var ethers = data.result / 10**18;
+							that.convert(ethers, callback, !that.justdata);
+							
+						}
+					},
+					403: function(){
+						if (!that.justdata){
+							that.convert(0, callback, !that.justdata);
+						}
+						if (typeof fallback=='function'){
+							fallback();
+						}
+					}
 				}
-				
 			});
 		}
 	}
@@ -616,7 +666,7 @@ var Bitcoin = function (spec){
 	var that = Crypto(spec);
 	that.className="Bitcoin";
 	
-	that._getBalanceData = function(url, callback){
+	that._getBalanceData = function(url, callback, fallback){
 		if (spec.amount!=undefined && spec.amount!=''){
 			that.convert(spec.amount, callback, !that.justdata);
 		}else{
@@ -634,6 +684,10 @@ var Bitcoin = function (spec){
 					
 				}
 				
+			}).fail(function(){
+				if (typeof fallback == 'function'){
+					fallback();
+				}
 			});
 		}
 	}
@@ -651,9 +705,9 @@ var Creativecoin = function (spec){
 	that.api = spec.api;
 	that.api.crypto = that;
 	
-	that._getBalanceData = function(url, callback){
+	that._getBalanceData = function(url, callback, fallback){
 			
-		that.api._getBalanceData(url, callback);
+		that.api._getBalanceData(url, callback, fallback);
 		
 	}
 	return that;
@@ -671,9 +725,9 @@ var Litecoin = function (spec){
 	that.amount = spec.amount;
 	that.api.crypto = that;
 	
-	that._getBalanceData = function(url, callback){
+	that._getBalanceData = function(url, callback, fallback){
 		
-		that.api._getBalanceData(url, callback);
+		that.api._getBalanceData(url, callback, fallback);
 		
 	}
 	return that;	
@@ -690,9 +744,9 @@ var Dash = function (spec){
 	that.api = spec.api;
 	that.api.crypto = that;
 	
-	that._getBalanceData = function(url, callback){
+	that._getBalanceData = function(url, callback, fallback){
 			
-		that.api._getBalanceData(url, callback);
+		that.api._getBalanceData(url, callback, fallback);
 		
 	}
 	return that;
@@ -741,7 +795,7 @@ var Neo = function (spec){
 		});
 	}
 	
-	that._getBalanceData = function(url, callback){
+	that._getBalanceData = function(url, callback, fallback){
 		url = that.pattern.replace(/{address}/g, (spec.addresses[0].address!=undefined ? spec.addresses[0].address : '') );
 		$.get(url, function(data){
 			$(data).find('.balance-list li a').each(function(){
@@ -755,6 +809,10 @@ var Neo = function (spec){
 				}
 			});
 			
+		}).fail(function(){
+			if (typeof fallback == 'function'){
+				fallback();
+			}
 		});
 		
 	}
@@ -792,7 +850,7 @@ var Faircoin = function (spec){
 	}
 	
 	
-	that._getBalanceData = function(url, callback){
+	that._getBalanceData = function(url, callback, fallback){
 		url = that.pattern.replace(/{action}/g, 'balance').replace(/{address}/g, (spec.addresses[0].address!=undefined ? spec.addresses[0].address : '') );
 		$.get(url, function(data){
 			$(data).find('h3 font.stats:eq(1)').each(function(){
@@ -801,6 +859,10 @@ var Faircoin = function (spec){
 				that.convert(value, callback, !that.justdata);
 			});
 			
+		}).fail(function(){
+			if (typeof fallback == 'function'){
+				fallback();
+			}
 		});
 		
 	}
@@ -831,18 +893,24 @@ var Ripple = function (spec){
 	var that = new Crypto(spec);
 	that.className="Ripple";
 	
-	that._getBalanceData = function(url, callback){
+	that._getBalanceData = function(url, callback, fallback){
 		url = that.pattern.replace(/{address}/g, (spec.addresses[0].address!=undefined ? spec.addresses[0].address : '') );
 		
-		$.get(url, function(data){
-			if (data.result=='success'){
-				var value = data.balances[0].value;
-				that.convert(value, callback, !that.justdata);
+		$.ajax({
+			url: url,
+			statusCode:{
+				200: function(data){
+					if (data.result=='success'){
+						var value = data.balances[0].value;
+						that.convert(value, callback, !that.justdata);
+					}
+				},
+				400: function(){fallback()},/*bad request*/
+				500: function(){fallback()},/*gateway error*/
+				503: function(){fallback()},/*service unavailable*/
+				504: function(){fallback()}/*timeout*/
 			}
-			
-			
 		});
-		
 	}
 	
 	return that;
@@ -930,6 +998,7 @@ var Kraken = function (spec){
         xhr.addEventListener("load", function(){
             try
             {
+            	console.log('No error on exchange');
                 ok(JSON.parse(this.responseText));
             }
             catch(err)
@@ -980,7 +1049,13 @@ var Kraken = function (spec){
 				
 			}
 		},
-		function(){/*reject*/});
+		function(){
+			console.debug('exchange coin load failed ');
+			if (typeof callback=='function'){
+				console.debug('getCryptos callback');
+				callback(cryptos);
+			}
+		});
 	}
 	
 	

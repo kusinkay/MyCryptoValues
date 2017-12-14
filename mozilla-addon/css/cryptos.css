@@ -1,4 +1,7 @@
 @CHARSET "UTF-8";
+.error{
+	color: red;
+}
 #setup{
 	display: none;
 }
