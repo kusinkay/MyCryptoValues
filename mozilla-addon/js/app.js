@@ -129,6 +129,7 @@ async function run(){
 			apis: apis,
 			exchanges: exchanges
 	}
+	await table.loadCache();
 	table.loadData(result, function(){
 		table.render();
 	});

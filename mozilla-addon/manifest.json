@@ -2,7 +2,7 @@
   "description": "Groups all my crypto coins to watch their fiat value",
   "manifest_version": 2,
   "name": "My Crypto Values",
-  "version": "1.17",
+  "version": "1.18",
   "homepage_url": "https://github.com/kusinkay/MyCryptoValues/tree/master/mozilla-addon",
   "icons": {
     "48": "icons/crypto-48.png"
@@ -10,6 +10,7 @@
   
   "permissions": [
     "activeTab", "alarms", "storage", "downloads",
+    "*://blockchain.info/*", 
     "*://chainz.cryptoid.info/*", 
     "*://api.kraken.com/*",
     "*://neoexplorer.co/*",
