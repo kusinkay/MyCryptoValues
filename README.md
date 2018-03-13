@@ -27,23 +27,16 @@ Balance for FAIR
 Balance for Ripple
 
 
-COIN			BALANCE	EUR
-
-Bitcoin			3		1
-
-Ethereum		2		1
-
-Creativecoin	0		1
-
-Litecoin		0		1
-
-Neo				4		5
-
-Faircoin		6		K
-
-Dash			0		1
-
-Ripple			7		1
+| COIN | BALANCE | EUR |
+|------|---------|-----|
+| Bitcoin | 3	|	1 |
+| Creativecoin | 0 | 1 |
+| Dash | 0 | 1 |
+| Ethereum | 2 | 1 |
+| Faircoin | 6 | K |
+| Litecoin | 0 | 1 |
+| Neo | 4	|	5 |
+| Ripple | 7 | 1 |
 
 
 # Thanks
