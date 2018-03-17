@@ -56,6 +56,9 @@ function convert(){
 		case 'XRP':
 			crypto = new Ripple(o);
 			break;
+		case 'FAIR':
+			crypto = new Faircoin(o);
+			break;
 	}
 	
 	var sense = $('#sense').val();

@@ -39,9 +39,9 @@ var CryptoTable = function(ctObj){
 	        {
 	            if(!result || !result.cache) {
 	            	console.debug('could not load cache from storage');
-	            	
+	            	ok();
 	            }else{
-		            console.debug('loading cryptos from storage');
+		            console.debug('loading cache from storage');
 		            //clone
 		            that.cache = JSON.parse(JSON.stringify(result.cache));
 
@@ -1021,11 +1021,11 @@ var Neo = function (spec){
 var Faircoin = function (spec){
 	spec.pattern = 'https://chain.fair.to/address?address={address}';
 	spec.webPattern = 'https://chain.fair.to/address?address={address}';
-	
+	spec.coinfsname = 'faircoin';
 	var that = Crypto(spec);
 	that.className="Faircoin";
 	
-	that.convert = function(value, callback, render){
+	that.DISABLED_convert = function(value, callback, render){
 		
 						
 		var data = [];
