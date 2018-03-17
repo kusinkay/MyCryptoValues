@@ -35,7 +35,7 @@ Balance for Ripple
 | Ethereum | 2 | 1 |
 | Faircoin | 6 | K |
 | Litecoin | 0 | 1 |
-| Neo | 4	|	5 |
+| Neo | 4 | 1 |
 | Ripple | 7 | 1 |
 
 

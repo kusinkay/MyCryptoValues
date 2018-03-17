@@ -951,11 +951,11 @@ var Dash = function (spec){
 var Neo = function (spec){
 	spec.pattern = 'https://neoexplorer.co/addresses/{address}';
 	spec.webPattern = 'https://neoexplorer.co/addresses/{address}';
-	
+	spec.coinfsname = 'neo';
 	var that = Crypto(spec);
 	that.className="Neo";
 	
-	that.convert = function(value, callback, render){
+	that.DISABLED_convert = function(value, callback, render){
 		$.getJSON('https://www.cryptopia.co.nz/api/GetMarkets/BTC', function(response){
 			console.debug(response);
 			if (response && response.Success){
