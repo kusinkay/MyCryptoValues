@@ -176,6 +176,7 @@ function reloadCoins(result){
 			var altcoinj = parts[2];
 			var altcoin = cryptos[tokeni].contracts[altcoinj];
 			$('[name=contract]').val(altcoin.address);
+			$('[name=altcoinDecimals]').val(altcoin.decimals);
 			$('[name=fsname]').val(altcoin.fsname);
 			$('[name=altcoinInfo]').val(altcoin.info);
 			$('[name=altcoinAmount]').val(altcoin.amount);
@@ -204,6 +205,7 @@ function reloadCoins(result){
 		$('[name=contract]').val("");
 		$('[name=tokeni]').val(i);
 		$('[name=altcoinj]').val('');
+		$('[name=altcoinDecimals]').val('');
 		$('[name=fsname]').val('');
 		$('[name=bridge]').val('');
 		$('[name=bridgeAmount]').val('');
@@ -333,6 +335,7 @@ function reloadCoins(result){
 		var altcoinj = $('[name=altcoinj]').val();
 		var contract = {
 				address: $('[name=contract]').val(),
+				decimals: $('[name=altcoinDecimals]').val(),
 				fsname: $('[name=fsname]').val(),
 				info: $('[name=altcoinInfo]').val(),
 				amount: $('[name=altcoinAmount]').val()

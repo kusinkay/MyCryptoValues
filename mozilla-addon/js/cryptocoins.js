@@ -279,18 +279,18 @@ var CryptoTable = function(ctObj){
 		if (crypto.address){
 			if (that.cache[crypto.fsname]){
 				if (that.cache[crypto.fsname][crypto.address]){
-					console.debug('cache found');
+					console.debug('cache found ' + crypto.fsname);
 				}else{
-					console.debug('cache NOT found');
+					console.debug('cache NOT found ' + crypto.fsname);
 				}
 				return that.cache[crypto.fsname][crypto.address];
 			}
 		}else{
 			if (that.cache[crypto.className]){
 				if (that.cache[crypto.className][crypto.serialAddress()]){
-					console.debug('cache found');
+					console.debug('cache found ' + crypto.className);
 				}else{
-					console.debug('cache NOT found');
+					console.debug('cache NOT found ' + crypto.className);
 				}
 				return that.cache[crypto.className][crypto.serialAddress()];
 			}
@@ -313,7 +313,7 @@ var CryptoTable = function(ctObj){
 		that._renderOrData(true);
 	}
 	
-	that._renderOrData = function(justdata){
+	that._renderOrData = async function(justdata){
 		that.totalFiat = 0;
 		that.justdata = justdata;
 		that.remaining = that.cryptos.length;
@@ -332,10 +332,9 @@ var CryptoTable = function(ctObj){
 			if (thisCrypto.getFsName()=='ethereum'){
 				that.remaining += thisCrypto.contracts.length;
 				for (var j=0; j<thisCrypto.contracts.length; j++){
-					thisCrypto.getAltCoin(j, function(data){
-						that.totalFiat += data[0].fiat;
-						that.renderTotalFiat();
-					});
+					let data = await thisCrypto.getAltCoin(j);
+					that.totalFiat += data[0].fiat;
+					that.renderTotalFiat();
 				}
 			}
 		}
@@ -685,41 +684,53 @@ var Crypto = function (spec){
 	}
 	
 	that.getAltCoin = function(currentIndex, callback){
+		return new Promise( function (callback, reject){
 		var currentAltCoin = that.contracts[currentIndex];
 		if ((currentAltCoin.address==undefined || currentAltCoin.address=='')&& currentAltCoin.amount!=undefined && currentAltCoin.amount!=''){
 			that._convertAltCoin(currentAltCoin, currentAltCoin.amount, callback);
 		}else{
 			var url = that.pattern.replace(/{action}/g, 'tokenbalance').replace(/{address}/g, spec.addresses[0].address);
 			url = url.replace(/{contract}/g, currentAltCoin.address);
-			try{
-			$.ajax({
-				url: url,
-				dataType: "json",
-				statusCode: {
-					200: function(data){
-						if (data.error != undefined){
-							
-						}else{
-							if(data.message == 'OK'){
-								var ethers = data.result / 10**18;
-								console.debug(that.contracts);
-								if (that.table){
-									that.table.toCache(currentAltCoin, data);
+			{
+				try{
+					$.ajax({
+						url: url,
+						dataType: "json",
+						statusCode: {
+							200: function(data){
+								
+								if (data.error != undefined){
+									
+								}else{
+									if(data.message == 'OK'){
+										console.debug(that.contracts[currentIndex]);
+										var decimals = 18;
+										var currentAltcoin = that.contracts[currentIndex];
+										if (currentAltcoin!=undefined && currentAltcoin.decimals!=undefined && currentAltcoin.decimals!=""){
+											decimals = currentAltcoin.decimals;
+											console.debug("decimals: " + currentAltcoin.decimals);
+										}
+										
+										var ethers = data.result / 10**decimals;
+										console.debug(that.contracts);
+										if (that.table){
+											that.table.toCache(currentAltCoin, data);
+										}
+										that._convertAltCoin(currentAltCoin, ethers, callback);
+									}
 								}
-								that._convertAltCoin(currentAltCoin, ethers, callback);
+							},
+							403: function(jqxhr, textStatus, error){
+								that.fallbackAltCoin(currentIndex, callback);
 							}
 						}
-					},
-					403: function(jqxhr, textStatus, error){
-						that.fallbackAltCoin(currentIndex, callback);
-					}
+					});
+				}catch(e){
+					console.error('Altcoin tokenbalance failed (' + textStatus + '): ' + currentAltCoin.address);
 				}
-			});
-			}catch(e){
-				console.error('Altcoin tokenbalance failed (' + textStatus + '): ' + currentAltCoin.address);
-			}
-			
+			};
 		}
+		});
 	}
 	
 	that.fallbackAltCoin = function(i, callback){
@@ -734,8 +745,12 @@ var Crypto = function (spec){
 				if (!that.contracts[i].warnings){
 					that.contracts[i].warnings = [];
 				}
-				that.contracts[i].warnings.push('Altcoin loaded from cache');
-				var value = response.result / 10**18;
+				that.contracts[i].warnings.push('Altcoin loaded from cache ' + that.contracts[i].fsname);
+				var decimals = 18;
+				if (that.contracts[i].decimals!=undefined){
+					decimals = that.contracts[i].decimals;
+				}
+				var value = response.result / 10**decimals;
 				
 				that._convertAltCoin(that.contracts[i], value, callback);
 			}
@@ -745,7 +760,7 @@ var Crypto = function (spec){
 				that.contracts[i].errors = [];
 			}
 			that.contracts[i].errors.push('Token contract not loaded');
-			console.error('Altcoin tokenbalance failed ');
+			console.error('Altcoin tokenbalance failed ' + that.contracts[i].fsname);
 			that._convertAltCoin(that.contracts[i], 0, callback);
 		}
 	}
