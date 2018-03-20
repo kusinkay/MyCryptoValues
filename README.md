@@ -45,3 +45,5 @@ https://openclipart.org/user-detail/pgbrandolin for https://openclipart.org/deta
 https://framagit.org/tfeserver for https://framagit.org/tfeserver/kraken_ticker/
 
 https://openclipart.org/user-detail/Andy for https://openclipart.org/detail/67/tools-hammer-spanner
+
+https://sprymedia.co.uk/ for https://datatables.net/

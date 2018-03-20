@@ -42,3 +42,7 @@
         transform:rotate(0deg);
     }
 }
+.credits{
+	text-align: center;
+	font-size: 0.8em;
+}
