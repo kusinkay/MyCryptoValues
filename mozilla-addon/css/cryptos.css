@@ -42,6 +42,9 @@
         transform:rotate(0deg);
     }
 }
+a{
+	color: #6e6868;
+}
 .credits{
 	text-align: center;
 	font-size: 0.8em;

@@ -571,8 +571,9 @@ var Crypto = function (spec){
 	that.render = function(data){
 		data = (data==undefined ? spec.output : data);
 		var output = data.price_eur * (data.bridge!=undefined ? (data.value * data.bridge.amount) : data.value);
-		if (spec.webPattern!=undefined && spec.address!=undefined && spec.address!=''){
-			data.url = spec.webPattern.replace(/{address}/g, spec.address).replace(/{contract}/g, data.contract);
+		var webPattern = (data.webPattern!=undefined ? data.webPattern : spec.webPattern);
+		if (webPattern!=undefined && spec.address!=undefined && spec.address!=''){
+			data.url = webPattern.replace(/{address}/g, spec.address).replace(/{contract}/g, data.contract);
 		}
 		if (!that.justdata){
 			var bridgeInfo = (data.bridge!=undefined ? '' + (data.value * data.bridge.amount) + ' ' + data.bridge.coinfsname + "\n" : "");
@@ -582,7 +583,7 @@ var Crypto = function (spec){
 				urlInfo = '&nbsp;<a target="_blank" href="'+data.url+'">+</a>'
 			}else if (that.addresses!=undefined){
 				for(var i=0; i<that.addresses.length; i++){
-					var url = spec.webPattern.replace(/{address}/g, that.addresses[i].address).replace(/{contract}/g, data.contract);
+					var url = webPattern.replace(/{address}/g, that.addresses[i].address).replace(/{contract}/g, data.contract);
 					urlInfo += '&nbsp;<a target="_blank" href="'+ url +'">+</a>'
 				}
 			}
@@ -770,13 +771,14 @@ var Crypto = function (spec){
 		if (currentAltCoin.bridgecoin!=null){
 			fsname = currentAltCoin.bridgecoin.coinfsname;
 		}
-		spec.webPattern = 'https://etherscan.io/token/{contract}?a={address}';
+		var webPattern = 'https://etherscan.io/token/{contract}?a={address}';
 		$.getJSON('https://api.coinmarketcap.com/v1/ticker/' + fsname + '/?convert=' + outCur, function(data){
 			data[0].value = ethers;
 			if (currentAltCoin.bridgecoin!=null){
 				data[0].name = currentAltCoin.fsname;
 				data[0].bridge = currentAltCoin.bridgecoin;
 			}
+			data[0].webPattern = webPattern;
 			data[0].contract = currentAltCoin.address;
 			data[0].errors = currentAltCoin.errors;
 			data[0].warnings = currentAltCoin.warnings;
@@ -789,6 +791,7 @@ var Crypto = function (spec){
 		.fail(function(){
 			var data = [];
 			data[0] = {'name' : currentAltCoin.fsname, 'price_eur': 0, 'value': ethers, 'percent_change_1h': '?', 'percent_change_24h': '?', 'percent_change_7d': '?'};
+			data[0].webPattern = webPattern;
 			var fiat = that.render(data[0])
 			data[0].fiat = fiat;
 			if (typeof callback=='function'){
