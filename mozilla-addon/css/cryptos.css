@@ -1,4 +1,8 @@
 @CHARSET "UTF-8";
+body{
+	font-family: Arial;
+	font-size: 12px;
+}
 .error{
 	color: red;
 }

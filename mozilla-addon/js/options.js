@@ -147,6 +147,9 @@ function reloadCoins(result){
 		if (cryptos[i].address!=undefined && cryptos[i].address!=''){
 			$('[name=address]').val(cryptos[i].address);
 		}
+		if (cryptos[i].buyprice!=undefined && cryptos[i].buyprice!=''){
+			$('[name=buyprice]').val(cryptos[i].buyprice);
+		}
 		$('.block:not(:last-child)').remove();
 		if (cryptos[i].addresses!=undefined){
 			for(var j=0; j<cryptos[i].addresses.length; j++){
@@ -158,6 +161,11 @@ function reloadCoins(result){
 			$('[name=amount]').val(cryptos[i].amount);
 		}else{
 			$('[name=amount]').val('');
+		}
+		if (cryptos[i].buyprice !=undefined){
+			$('[name=buyprice]').val(cryptos[i].buyprice);
+		}else{
+			$('[name=buyprice]').val('');
 		}
 
 		$('[name=info]').val(cryptos[i].info);
@@ -280,6 +288,7 @@ function reloadCoins(result){
 		$('[name=class]').val("")
 			.removeAttr("disabled");
 		$('[name=address]').val("");
+		$('[name=buyprice]').val("");
 		$('.block:not(:last-child)').remove();
 		$('[name=info]').val("");
 		$('[name=amount]').val("");
@@ -312,6 +321,7 @@ function reloadCoins(result){
 		var crypto = {
 			class: $('[name=class]').val(),
 			amount: $('[name=amount]').val(),
+			buyprice: $('[name=buyprice]').val(),
 			info: $('[name=info]').val(),
 			addresses: []
 		};

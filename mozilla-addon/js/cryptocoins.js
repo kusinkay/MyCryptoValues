@@ -138,6 +138,9 @@ var CryptoTable = function(ctObj){
 		}else{
 			xLoaded=0;
 		}
+		if (xLoaded==0 && cLoaded && apisLoaded && typeof callback == 'function'){
+			callback();
+		}
 	}
 	
 	that.loadFile = function(file, callback){
@@ -343,6 +346,10 @@ var CryptoTable = function(ctObj){
 	
 	that.round = function(value, decimals){
 		return that.cryptos[0].round(value, decimals);
+	}
+	
+	that.pad = function(num, size) {
+		return that.cryptos[0].round(num, size);
 	}
 	
 	that.renderTotalFiat = function(){
@@ -593,12 +600,21 @@ var Crypto = function (spec){
 			}else if (that.warnings.length>0 || data.warnings && data.warnings.length>0){
 				errInfo = 'warning';
 			}
+			var gain = 0;
+			if (spec.buyprice!=undefined){
+				//gain = (spec.buyprice > output ? "-" : "+");
+				gain = ((output - spec.buyprice) / spec.buyprice) * 100;
+				gain = that.round(gain, 2);
+			}
+			var valueAnchor = "<span style='display:none'>" + that.pad(that.round(data.value * 10**5, 0), 10) + '</span>';
+			var gainInfo = "<span style='display:none'>" + that.pad(that.round(gain, 0), 10) + "</span>" + gain;
 			$(spec.container).prepend('<tr class="' + errInfo + '"><td>'+ data.name + urlInfo +
 				"</td>"+
-				"<td><a href='#' title='" + bridgeInfo + "'>" + data.value + (that.amount!=undefined && that.amount!='' ? '(k)' : '') + "</td>"+
+				"<td style='text-align:center'>" + valueAnchor + "<a href='#' title='" + bridgeInfo + "'>" + data.value + (that.amount!=undefined && that.amount!='' ? '(k)' : '') + "</td>"+
 				"<td>" + data.percent_change_1h + "</td>"+
 				"<td>" + data.percent_change_24h + "</td>"+
 				"<td>" + data.percent_change_7d + "</td>"+
+				"<td style='text-align:center'>" + gainInfo + "</td>"+
 				"<td style='text-align:right' class='fiat'>" + that.round(output, 2) + spec.outCurSym + "</td></tr>");
 		}
 		return output;
@@ -614,6 +630,12 @@ var Crypto = function (spec){
 	
 	that.round = function(value, decimals){
 		return Math.round(value * 10**decimals) / 10**decimals;
+	}
+	
+	that.pad = function(num, size) {
+	    var s = num+"";
+	    while (s.length < size) s = "0" + s;
+	    return s;
 	}
 	
 	that.output = function(html){
@@ -1257,10 +1279,15 @@ var Kraken = function (spec){
 		            }
 		        }
 				if (typeof callback=='function'){
-					console.debug('getCryptos callback');
+					console.debug('getCryptos [from exchange] callback');
 					callback(cryptos);
 				}
 				
+			} else {
+				if (typeof callback=='function'){
+					console.debug('getCryptos [from exchange] fallback');
+					callback(cryptos);
+				}
 			}
 		},
 		function(){
