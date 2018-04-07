@@ -600,16 +600,18 @@ var Crypto = function (spec){
 			}else if (that.warnings.length>0 || data.warnings && data.warnings.length>0){
 				errInfo = 'warning';
 			}
+			var buyprice = (data.buyprice!=undefined ? data.buyprice : spec.buyprice);
 			var gain = 0;
 			var gainTooltip = "";
-			if (spec.buyprice!=undefined && spec.buyprice!=''){
-				//gain = (spec.buyprice > output ? "-" : "+");
-				gain = ((output - spec.buyprice) / spec.buyprice) * 100;
+			
+			if (buyprice!=undefined && buyprice!=''){
+				//gain = (buyprice > output ? "-" : "+");
+				gain = ((output - buyprice) / buyprice) * 100;
 				gain = that.round(gain, 2);
-				if (spec.buyprice==0){
+				if (buyprice==0){
 					gain = 'Gift';
 				}
-				gainTooltip = spec.buyprice + spec.outCurSym + " vs " + that.round(output, 2) + spec.outCurSym;
+				gainTooltip = buyprice + spec.outCurSym + " vs " + that.round(output, 2) + spec.outCurSym;
 			}
 			/*trick to order columns*/
 			var valueAnchor = "<span style='display:none'>" + that.pad(that.round(data.value * 10**5, 0), 10) + '</span>';
@@ -809,6 +811,8 @@ var Crypto = function (spec){
 			}
 			data[0].webPattern = webPattern;
 			data[0].contract = currentAltCoin.address;
+			data[0].buyprice = currentAltCoin.buyprice;
+			
 			data[0].errors = currentAltCoin.errors;
 			data[0].warnings = currentAltCoin.warnings;
 			var fiat = that.render(data[0]);

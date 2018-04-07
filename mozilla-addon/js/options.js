@@ -187,6 +187,7 @@ function reloadCoins(result){
 			$('[name=altcoinDecimals]').val(altcoin.decimals);
 			$('[name=fsname]').val(altcoin.fsname);
 			$('[name=altcoinInfo]').val(altcoin.info);
+			$('[name=altcoinBuyprice]').val(altcoin.buyprice);
 			$('[name=altcoinAmount]').val(altcoin.amount);
 			if (altcoin.bridgecoin){
 				$('[name=bridge]').val(altcoin.bridgecoin.class);
@@ -348,6 +349,7 @@ function reloadCoins(result){
 				decimals: $('[name=altcoinDecimals]').val(),
 				fsname: $('[name=fsname]').val(),
 				info: $('[name=altcoinInfo]').val(),
+				buyprice: $('[name=altcoinBuyprice]').val(),
 				amount: $('[name=altcoinAmount]').val()
 		};
 		
