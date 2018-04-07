@@ -601,20 +601,27 @@ var Crypto = function (spec){
 				errInfo = 'warning';
 			}
 			var gain = 0;
-			if (spec.buyprice!=undefined){
+			var gainTooltip = "";
+			if (spec.buyprice!=undefined && spec.buyprice!=''){
 				//gain = (spec.buyprice > output ? "-" : "+");
 				gain = ((output - spec.buyprice) / spec.buyprice) * 100;
 				gain = that.round(gain, 2);
+				if (spec.buyprice==0){
+					gain = 'Gift';
+				}
+				gainTooltip = spec.buyprice + spec.outCurSym + " vs " + that.round(output, 2) + spec.outCurSym;
 			}
+			/*trick to order columns*/
 			var valueAnchor = "<span style='display:none'>" + that.pad(that.round(data.value * 10**5, 0), 10) + '</span>';
 			var gainInfo = "<span style='display:none'>" + that.pad(that.round(gain, 0), 10) + "</span>" + gain;
+			/*table row*/
 			$(spec.container).prepend('<tr class="' + errInfo + '"><td>'+ data.name + urlInfo +
 				"</td>"+
 				"<td style='text-align:center'>" + valueAnchor + "<a href='#' title='" + bridgeInfo + "'>" + data.value + (that.amount!=undefined && that.amount!='' ? '(k)' : '') + "</td>"+
 				"<td>" + data.percent_change_1h + "</td>"+
 				"<td>" + data.percent_change_24h + "</td>"+
 				"<td>" + data.percent_change_7d + "</td>"+
-				"<td style='text-align:center'>" + gainInfo + "</td>"+
+				"<td style='text-align:center'><a href='#' title='" + gainTooltip + "'>" + gainInfo + "</a></td>"+
 				"<td style='text-align:right' class='fiat'>" + that.round(output, 2) + spec.outCurSym + "</td></tr>");
 		}
 		return output;

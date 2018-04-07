@@ -142,7 +142,7 @@ run();
 
 $(document).ready(function(){
 	convert();
-	$( document ).tooltip();
+	/*$( document ).tooltip();*/
 	$('#token, #inTokens, #outEuros').change(function(){convert()});
 	$('#inTokens, #outEuros').focus(function(){
 		var sense ="LTR";
