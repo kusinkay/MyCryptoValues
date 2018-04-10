@@ -603,7 +603,7 @@ var Crypto = function (spec){
 			var buyprice = (data.buyprice!=undefined ? data.buyprice : spec.buyprice);
 			var gain = 0;
 			var gainTooltip = "";
-			
+			var absGain = 0 + spec.outCurSym;
 			if (buyprice!=undefined && buyprice!=''){
 				//gain = (buyprice > output ? "-" : "+");
 				gain = ((output - buyprice) / buyprice) * 100;
@@ -612,6 +612,7 @@ var Crypto = function (spec){
 					gain = 'Gift';
 				}
 				gainTooltip = buyprice + spec.outCurSym + " vs " + that.round(output, 2) + spec.outCurSym;
+				absGain = (that.round(output - buyprice, 2)) + spec.outCurSym;
 			}
 			/*trick to order columns*/
 			var valueAnchor = "<span style='display:none'>" + that.pad(that.round(data.value * 10**5, 0), 10) + '</span>';
@@ -620,10 +621,11 @@ var Crypto = function (spec){
 			$(spec.container).prepend('<tr class="' + errInfo + '"><td>'+ data.name + urlInfo +
 				"</td>"+
 				"<td style='text-align:center'>" + valueAnchor + "<a href='#' title='" + bridgeInfo + "'>" + data.value + (that.amount!=undefined && that.amount!='' ? '(k)' : '') + "</td>"+
-				"<td>" + data.percent_change_1h + "</td>"+
-				"<td>" + data.percent_change_24h + "</td>"+
-				"<td>" + data.percent_change_7d + "</td>"+
+				"<td style='text-align:center'>" + data.percent_change_1h + "</td>"+
+				"<td style='text-align:center'>" + data.percent_change_24h + "</td>"+
+				"<td style='text-align:center'>" + data.percent_change_7d + "</td>"+
 				"<td style='text-align:center'><a href='#' title='" + gainTooltip + "'>" + gainInfo + "</a></td>"+
+				"<td style='text-align:right' class='fiat'>" + absGain + "</td>"+
 				"<td style='text-align:right' class='fiat'>" + that.round(output, 2) + spec.outCurSym + "</td></tr>");
 		}
 		return output;
