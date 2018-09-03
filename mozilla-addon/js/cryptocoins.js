@@ -1046,20 +1046,30 @@ var Neo = function (spec){
 	
 	that._getBalanceData = function(url, callback, fallback){
 		url = that.pattern.replace(/{address}/g, (spec.addresses[0].address!=undefined ? spec.addresses[0].address : '') );
-		$.get(url, function(data){
-			$(data).find('.balance-list li a').each(function(){
-				if ($(this).html().trim()=='NEO'){
-					$(this).parent().find('strong').each(function(){
-						var value = $(this).html().trim();
-						console.debug(value);
-						that.convert(value, callback, !that.justdata);
-					});
-					
+		$.ajax({
+			url: url,
+			timeout: 8000,
+			done: function(data){
+				if ($(data).find('.balance-list li a').length==0){
+					if (typeof fallback == 'function'){
+						fallback();
+					}
 				}
-			});
-			
-		}).fail(function(){
+				$(data).find('.balance-list li a').each(function(){
+					if ($(this).html().trim()=='NEO'){
+						$(this).parent().find('strong').each(function(){
+							var value = $(this).html().trim();
+							console.debug(value);
+							that.convert(value, callback, !that.justdata);
+						});
+						
+					}
+		 		})
+			}
+		})
+		.fail(function(){
 			if (typeof fallback == 'function'){
+				console.debug("NEO balance failed");
 				fallback();
 			}
 		});
