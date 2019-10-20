@@ -11,7 +11,7 @@ var CryptoTable = function(ctObj){
 	that.availableCryptos = [
 	                         "Bitcoin",
 	                         "Ethereum",
-	                         "Creativecoin",
+	                         /*"Creativecoin",*/
 	                         "Litecoin",
 	                         "Neo",
 	                         "Faircoin",
@@ -332,7 +332,7 @@ var CryptoTable = function(ctObj){
 				that.renderTotalFiat();
 				that.converts.push(data[0]);
 			});
-			if (thisCrypto.getFsName()=='ethereum'){
+			if (thisCrypto.getFsName()=='ETH'){
 				that.remaining += thisCrypto.contracts.length;
 				for (var j=0; j<thisCrypto.contracts.length; j++){
 					let data = await thisCrypto.getAltCoin(j);
@@ -401,7 +401,11 @@ var RemoteAPI = function(apispec){
 	that.pattern = apispec.pattern;
 	
 	that.getBalance = function(){
-		console.error('RemoteAPI.getBalance must bu overriden');
+		console.error('RemoteAPI.getBalance must be overriden');
+	}
+	
+	that.convert = function (){
+		console.error('RemoteAPI.convert must be overriden');
 	}
 	
 	return that;
@@ -674,14 +678,34 @@ var Crypto = function (spec){
 	that.convert = function(value, callback, render){
 		var fsname = spec.coinfsname;
 		
-		$.getJSON('https://api.coinmarketcap.com/v1/ticker/' + spec.coinfsname + '/?convert=' + spec.outCur, function(data){
-			data[0].value = value;
-			spec.output = data[0];
-			data[0].fiat = that.render(data[0]);
-			if (typeof( callback) == 'function'){
-				callback(data);
+		$.ajax({
+			url: 'https://pro-api.coinmarketcap.com/v1/tools/price-conversion',
+			data: 'symbol=' + spec.coinfsname + '&amount=1&convert=' + spec.outCur + '',
+			type: 'GET',
+			crossDomain: true,			
+			dataType: 'json',
+			success: function(response){
+				var data = [];
+				data.push({});
+				data[0].value = value;
+				data[0].price_eur = response.data.quote.EUR.price;
+				data[0].name = that.className;
+				spec.output = data[0];
+				data[0].fiat = that.render(data[0]);
+				if (typeof( callback) == 'function'){
+					callback(data);
+				}
+			},
+			error: function(response){
+				console.error("error en convert de coinmarketcap: " + response.responseJSON.status.error_message);
+			},
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader('X-CMC_PRO_API_KEY', that.getApiKey('coinmarketcap').api_key);
+		        xhr.setRequestHeader('Accept', 'application/json');
 			}
+		 
 		});
+		
 		/*
 		console.debug('is pair in cache?: [' + fsname+'][' + spec.outCur + ']');
 		if (that.table && that.table.pairs && that.table.pairs[fsname] && that.table.pairs[fsname][spec.outCur]){
@@ -805,33 +829,49 @@ var Crypto = function (spec){
 			fsname = currentAltCoin.bridgecoin.coinfsname;
 		}
 		var webPattern = 'https://etherscan.io/token/{contract}?a={address}';
-		$.getJSON('https://api.coinmarketcap.com/v1/ticker/' + fsname + '/?convert=' + outCur, function(data){
-			data[0].value = ethers;
-			if (currentAltCoin.bridgecoin!=null){
+		$.ajax({
+			url: 'https://pro-api.coinmarketcap.com/v1/tools/price-conversion',
+			data: 'symbol=' + fsname + '&amount=1&convert=' + outCur + '',
+			type: 'GET',
+			crossDomain: true,			
+			dataType: 'json',
+			success: function(response){
+				var data = [];
+				data.push({});
+				data[0].value = ethers;
+				data[0].price_eur = response.data.quote.EUR.price;
 				data[0].name = currentAltCoin.fsname;
-				data[0].bridge = currentAltCoin.bridgecoin;
+				
+				if (currentAltCoin.bridgecoin!=null){
+					data[0].bridge = currentAltCoin.bridgecoin;
+				}
+				data[0].webPattern = webPattern;
+				data[0].contract = currentAltCoin.address;
+				data[0].buyprice = currentAltCoin.buyprice;
+				
+				data[0].errors = currentAltCoin.errors;
+				data[0].warnings = currentAltCoin.warnings;
+				var fiat = that.render(data[0]);
+				data[0].fiat = fiat;
+				if (typeof callback=='function'){
+					callback(data);
+				}
+			},
+			error: function(){
+				var data = [];
+				data[0] = {'name' : currentAltCoin.fsname, 'price_eur': 0, 'value': ethers, 'percent_change_1h': '?', 'percent_change_24h': '?', 'percent_change_7d': '?'};
+				data[0].webPattern = webPattern;
+				var fiat = that.render(data[0])
+				data[0].fiat = fiat;
+				if (typeof callback=='function'){
+					callback(data);
+				}
+			},
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader('X-CMC_PRO_API_KEY', that.getApiKey('coinmarketcap').api_key);
+		        xhr.setRequestHeader('Accept', 'application/json');
 			}
-			data[0].webPattern = webPattern;
-			data[0].contract = currentAltCoin.address;
-			data[0].buyprice = currentAltCoin.buyprice;
-			
-			data[0].errors = currentAltCoin.errors;
-			data[0].warnings = currentAltCoin.warnings;
-			var fiat = that.render(data[0]);
-			data[0].fiat = fiat;
-			if (typeof callback=='function'){
-				callback(data);
-			}
-		})
-		.fail(function(){
-			var data = [];
-			data[0] = {'name' : currentAltCoin.fsname, 'price_eur': 0, 'value': ethers, 'percent_change_1h': '?', 'percent_change_24h': '?', 'percent_change_7d': '?'};
-			data[0].webPattern = webPattern;
-			var fiat = that.render(data[0])
-			data[0].fiat = fiat;
-			if (typeof callback=='function'){
-				callback(data);
-			}
+		 
 		});
 		
 	}
@@ -851,7 +891,7 @@ var Ethereum = function(spec){
 	
 	var endPointEtherScan = 'https://api.etherscan.io/api';	
 
-	spec.coinfsname = 'ethereum';
+	spec.coinfsname = 'ETH';
 	spec.webPattern = 'https://etherscan.io/address/{address}';
 	var that = Crypto(spec);
 	var etherscanAPIKey = that.getApiKey('etherscan').api_key;
@@ -895,7 +935,7 @@ var Ethereum = function(spec){
 }
 
 var Bitcoin = function (spec){
-	spec.coinfsname = 'bitcoin';
+	spec.coinfsname = 'BTC';
 	spec.pattern = 'https://blockchain.info/q/addressbalance/{address}';
 	spec.webPattern = 'https://blockchain.info/address/{address}';
 	var that = Crypto(spec);
@@ -962,7 +1002,7 @@ var Creativecoin = function (spec){
 }
 
 var Litecoin = function (spec){
-	spec.coinfsname = 'litecoin';
+	spec.coinfsname = 'LTC';
 	spec.api = new CryptoidAPI({fsname: 'ltc', address:spec.address});
 	spec.webPattern = 'https://chainz.cryptoid.info/ltc/address.dws?{address}.htm';
 	var that = Crypto(spec);
@@ -982,7 +1022,7 @@ var Litecoin = function (spec){
 }
 
 var Dash = function (spec){
-	spec.coinfsname = 'dash';
+	spec.coinfsname = 'DASH';
 	spec.api = new CryptoidAPI({fsname: 'dash', address:spec.address});
 	spec.webPattern = 'https://chainz.cryptoid.info/dash/address.dws?{address}.htm';
 	var that = Crypto(spec);
@@ -1004,7 +1044,7 @@ var Dash = function (spec){
 var Neo = function (spec){
 	spec.pattern = 'https://neoexplorer.co/addresses/{address}';
 	spec.webPattern = 'https://neoexplorer.co/addresses/{address}';
-	spec.coinfsname = 'neo';
+	spec.coinfsname = 'NEO';
 	var that = Crypto(spec);
 	that.className="Neo";
 	
@@ -1084,7 +1124,7 @@ var Neo = function (spec){
 var Faircoin = function (spec){
 	spec.pattern = 'https://chain.fair.to/address?address={address}';
 	spec.webPattern = 'https://chain.fair.to/address?address={address}';
-	spec.coinfsname = 'faircoin';
+	spec.coinfsname = 'FAIR';
 	var that = Crypto(spec);
 	that.className="Faircoin";
 	
@@ -1147,7 +1187,7 @@ var Ripple = function (spec){
 	
 	spec.pattern = 'https://data.ripple.com/v2/accounts/{address}/balances';
 	spec.webPattern = 'https://data.ripple.com/v2/accounts/{address}/balances';
-	spec.coinfsname = 'ripple';
+	spec.coinfsname = 'XRP';
 	
 	var that = new Crypto(spec);
 	that.className="Ripple";

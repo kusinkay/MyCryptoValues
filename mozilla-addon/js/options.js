@@ -20,6 +20,9 @@ function saveOptions(e) {
   if ($('[name=etherscan_api_key]').val()!=''){
 	  apis.push({web: 'etherscan',api_key: $('[name=etherscan_api_key]').val()});
   }
+  if ($('[name=coinmarketcap_api_key]').val()!=''){
+	  apis.push({web: 'coinmarketcap',api_key: $('[name=coinmarketcap_api_key]').val()});
+  }
   browser.storage.local.set({cryptos: cryptos, apis: apis});
 }
 

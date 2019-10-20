@@ -4,7 +4,7 @@
 var browser = browser || chrome;
 
 browser.alarms.onAlarm.addListener(run);
-browser.alarms.create('update', {periodInMinutes: 1 });
+browser.alarms.create('update', {periodInMinutes: 5 });
 
 var cryptos,
 	apis,
